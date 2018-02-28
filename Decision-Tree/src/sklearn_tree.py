@@ -19,7 +19,7 @@ x_feature = df.iloc[:, :-1]
 print(x_feature)
 
 x_dict = x_feature.T.to_dict().values()
-#print(x_dict)
+print(x_dict)
 v = DictVectorizer(sparse=False)
 x_training = v.fit_transform(x_dict)
 print(x_training)
