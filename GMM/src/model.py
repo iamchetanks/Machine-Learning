@@ -1,3 +1,7 @@
+#Reference
+#http://www.cse.iitm.ac.in/~vplab/courses/DVP/PDF/gmm.pdf
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,20 +13,6 @@ def read_data():
     df = pd.read_csv("../data/clusters.csv", header=None)
     return df
 
-# def amp(R1, R2, R3):
-#     N = (np.sum(R1) + np.sum(R2) + np.sum(R3))
-#     amp1 = np.sum(R1) / N
-#     amp2 = np.sum(R2) / N
-#     amp3 = np.sum(R3) / N
-#     return amp1, amp2, amp3
-
-# def mean(R1, R2, R3, X):
-#     M1 = np.dot(R1, X) / np.sum(R1)
-#     #print(M1.shape)
-#     M2 = np.dot(R2, X) / np.sum(R2)
-#     M3 = np.dot(R3, X) / np.sum(R3)
-#     return M1, M2, M3
-
 def normal_distribution(covariance, X, M):
     #print(covariance.shape)
     cova_inverse = np.linalg.inv(covariance)
@@ -33,40 +23,50 @@ def normal_distribution(covariance, X, M):
     #print(P.shape)
     return P
 
+
+def initialisation(df, c):
+    n, d = df.shape
+    X = df.as_matrix()
+    M = X[np.random.choice(n, c, False), :]
+    R = np.random.rand(n, c)
+    W = [1. / c] * c
+    covariance = [np.eye(d)] * c
+    return X, M, R, W, covariance
+
+
 def main():
     df = read_data()
     n, d = df.shape
-    #print(df.head())
-    X = df.as_matrix()
-    #X = X.transpose()
-    M = X[np.random.choice(n,3,False), :]
-    R = np.random.rand(n, 3)
-    # N = (np.sum(R[0]) + np.sum(R[1]) + np.sum(R[2]))
-    # for i in range(3):
-    #     amp[i] = amp(R[:,i], N)
+    c = 3
 
-    W = [1. / 3] * 3
-    covariance = [np.eye(d)] * 3
-    for i in range(100):
-        for i in range(3):
+    X, M, R, W, covariance = initialisation(df, c)
+
+    temp_lh = 0
+    for i in range(1000):
+
+        for i in range(c):
             R[:, i] = W[i] * normal_distribution(covariance[i], X, M[i])
 
         R = (R.T / np.sum(R, axis=1)).T
-        #print(R)
         R_sum = np.sum(R, axis = 0)
-        #print(R_sum[0])
-        for i in range(3):
+
+        for i in range(c):
             M[i] = 1.0 / R_sum[i] * np.sum(R[:, i] * X.T, axis=1).T
 
-
-        for i in range(3):
+        for i in range(c):
             D = np.matrix(X - M[i])
             covariance[i] = np.dot(np.multiply(D.T, R[:, i]), D) / R_sum[i]
             W[i] = 1. / n * R_sum[i]
 
+        lh = np.sum(np.log(np.sum(R, axis=1)))
+        if temp_lh == lh:
+            break
+        else:
+            temp_lh = lh
+
     print("Means")
     print(M)
-    print("amp")
+    print("amplitude")
     print(W)
     print("covariance")
     print(covariance)
