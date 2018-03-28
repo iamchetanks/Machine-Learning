@@ -15,7 +15,6 @@ learning_rate = 0.05
 max_steps = 1000
 
 
-
 # Prepare data
 X_train, Y_train = model.read_file("../data/downgesture_train.list")
 X_test, Y_test = model.read_file("../data/downgesture_test.list")

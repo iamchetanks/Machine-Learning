@@ -149,7 +149,6 @@ def predict(X, y, parameters):
     return p
 
 
-
 def main():
     X_train, Y_train = read_file("../data/downgesture_train.list")
     X_test, Y_test = read_file("../data/downgesture_test.list")
@@ -208,7 +207,6 @@ def main():
     print("Test data")
     pred_test = predict(X_test, Y_test, parameters)
     print("Accuracy: " + str(np.sum((pred_test == Y_test) / X_test.shape[1])))
-
 
 
 if __name__ == "__main__":
